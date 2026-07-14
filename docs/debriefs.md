@@ -68,3 +68,38 @@ Approval fatigue is real, but it wasn't randomly distributed — it clustered ex
 - No-reply email — a GitHub-provided placeholder email address that hides your real one from public commit history.
 - .gitignore — a file that tells git which files to never track, commit, or push, even if they exist on disk.
 - Auto-approve / allowlist — a list of specific commands Claude Code can run without asking permission each time, versus everything else which still prompts.
+
+# Session 0.2 Debrief — Spec Craft
+Date: July 14, 2026
+
+## What shipped
+Practice PRD, tech design, and ADR-001 for a fictional "Hello World Comments" feature — Google-auth-gated comment threading with nested replies, admin delete via a role column. All three saved to docs/ and pushed.
+
+## What broke / what was confusing
+No real friction with the PRD or tech design — when an ambiguity surfaced (I'd over-gated reading, not just writing, comments behind sign-in), one correction fixed both documents cleanly. The ADR was genuinely hard: took three drafts, and I explicitly didn't know how to fill in Alternatives or Consequences without help walking through the mechanics first.
+
+## What Claude Code did well
+Not applicable — this was Claude.ai drafting work, no Claude Code build involved.
+
+## What Claude Code did badly
+Not applicable — no Claude Code build this session.
+
+## Oversight catches I'm proud of
+Caught that the read-gate had been extended beyond what I asked for (gating reads, not just writes) and corrected it in one line. The PRD and tech design correctly left the soft-delete-vs-hard-delete question open instead of quietly deciding it.
+
+## One thing missed / to improve
+My first ADR draft was missing Status/Date, had only one alternative instead of the two the template implies, no concrete type for the role column, and one place where my stated reason for rejecting an alternative didn't actually match the decision I made. Needed a structured walkthrough before I could write a clean version.
+
+## Next session
+Session 0.3, Loop Dry Run.
+
+## Session-specific reflection
+The PRD is clear to me — I understand it's the what and why, and I can tell when it's good. The Tech Design and the ADR are different. I understood their purpose in the abstract, but in the moment, the Tech Design just read as technical stuff placed in front of me — I didn't know what the content actually meant, and that made me tune out and get distracted faster than I expected. I was starting cold, with no sense of what "good" looks like for these two artifacts specifically, unlike the PRD where I already had a feel for it.
+
+The ADR was harder in a different way: not just unfamiliar content, but not knowing the universe of what should or shouldn't be included. Writing the PRD, I know what I want. Writing the ADR, I had to imagine alternatives I never seriously considered because I'd already decided — that's a different mental motion, and I don't yet have a sense of what's thorough versus what's missing.
+
+The real gap isn't understanding why these documents matter — I get that. It's bridging from "I understand the purpose" to "I know what good content looks like and can produce it with less help." That's especially true if I want this to hold up in a job context, where I'll need to know what belongs in a Tech Design or ADR without someone walking me through it each time. For now, I expect I'll need heavy Claude assistance on Tech Design and ADR content specifically, while the PRD is something I can already drive mostly on my own. Building the habit of always starting from a PRD, then leaning on help for the other two, is the workflow I need going into Project 1.
+
+## Terms I got stuck on
+- PRD (Product Requirements Doc) vs. Tech Design Doc vs. ADR — the PRD covers what's being built and why, no code. The Tech Design Doc covers how it's being built — stack, schema, routes. The ADR (Architecture Decision Record) documents one specific decision in four short sections: Context, Decision, Alternatives, Consequences.
+- ADR specifically — I understood the format but not how to generate real content for Alternatives and Consequences from scratch.
