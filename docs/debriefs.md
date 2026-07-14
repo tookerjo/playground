@@ -29,3 +29,35 @@ Need to keep building the mental model for file system architecture — home fol
 
 ## Next session
 Session 0.1 — Workspace & Tool Taxonomy. Practice the dual-loop on playground repo. Get comfortable with git, Terminal navigation, and Cursor as daily driver.
+
+# Session 0.1-lite Debrief
+Date: July 13-14, 2026
+
+## What shipped
+- hello-world Next.js app built via Plan Mode, pushed to github.com/tookerjo/playground
+- ai-engineering-journey repo created and public, with README linking four planned project repos, plus lessons.md and prompts.md stubs
+- projects-backlog-private.md created and gitignored, holding six parked project ideas
+- Global git config set to GitHub no-reply email permanently
+- Global ~/.claude/CLAUDE.md created with five standing rules
+- Global ~/.claude/settings.json updated to auto-approve read-only commands (git status, git log, git diff, git show, git branch listing, ls, pwd, cat) while keeping manual approval for anything that writes, deletes, pushes, or is irreversible
+
+## What broke / what was confusing
+Claude Code login stalled mid-session and required /login. hello.md from Session 0.0 conflicted with create-next-app and was moved into docs/. GitHub blocked the first push twice (once in playground, once in ai-engineering-journey) because git was using a real email address; fixed per-repo both times before fixing it globally. Manual approval on every single command felt slow and frustrating at first.
+
+## What Claude Code did well
+Correctly proposed a full plan before touching files, caught the hello.md conflict itself and asked how to resolve it rather than failing silently, and validated its own settings.json edit with jq before declaring the auto-approval task done.
+
+## What Claude Code did badly
+None significant tonight — every failure mode encountered was environmental (auth, file conflict, email privacy) rather than the agent making a bad judgment call.
+
+## Oversight catches I'm proud of
+Caught that projects-backlog.md was about to be public with real business ideas in it, and restructured it into a public/private split before that became a problem. Fixed the email issue at the global level instead of repeating the per-repo fix a third time.
+
+## One thing missed / to improve
+Didn't do the Step 3 concept primer on Plan Mode until partway through the session, after already approving several commands on trust rather than understanding — went back and did it properly once I noticed I was just clicking through.
+
+## Next session
+Session 0.2, Spec Craft.
+
+## Session-specific reflection
+Approval fatigue is real, but it wasn't randomly distributed — it clustered exactly on the moment code left my machine and became public (the pushes), which is the correct place for friction to concentrate. Read-only commands are now auto-approved globally so future sessions won't repeat that specific fatigue.
