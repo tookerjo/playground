@@ -61,3 +61,9 @@ Session 0.2, Spec Craft.
 
 ## Session-specific reflection
 Approval fatigue is real, but it wasn't randomly distributed — it clustered exactly on the moment code left my machine and became public (the pushes), which is the correct place for friction to concentrate. Read-only commands are now auto-approved globally so future sessions won't repeat that specific fatigue.
+
+## Terms I got stuck on
+- Plan Mode — Claude Code explores and proposes a plan without touching files, then waits for approval before acting.
+- No-reply email — a GitHub-provided placeholder email address that hides your real one from public commit history.
+- .gitignore — a file that tells git which files to never track, commit, or push, even if they exist on disk.
+- Auto-approve / allowlist — a list of specific commands Claude Code can run without asking permission each time, versus everything else which still prompts.
