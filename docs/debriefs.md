@@ -63,6 +63,7 @@ Session 0.2, Spec Craft.
 Approval fatigue is real, but it wasn't randomly distributed — it clustered exactly on the moment code left my machine and became public (the pushes), which is the correct place for friction to concentrate. Read-only commands are now auto-approved globally so future sessions won't repeat that specific fatigue.
 
 ## Terms I got stuck on
+- Read-only vs. write commands — read-only commands (git status, git log, git diff, ls, cat) only look at files or information, they can't change anything, so they're safe to approve quickly. Write commands (git add, git commit, git push, anything with delete or force) actually change something — locally, or in the case of push, publicly and irreversibly — so they're worth reading closely before approving.
 - Plan Mode — Claude Code explores and proposes a plan without touching files, then waits for approval before acting.
 - No-reply email — a GitHub-provided placeholder email address that hides your real one from public commit history.
 - .gitignore — a file that tells git which files to never track, commit, or push, even if they exist on disk.
