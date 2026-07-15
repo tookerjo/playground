@@ -1,6 +1,6 @@
 # ADR-001: Admin access granted via a role column with user/admin values
 
-Status: proposed
+Status: accepted
 Date: 7/14/26
 
 ## Context
