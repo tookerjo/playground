@@ -71,13 +71,13 @@ playground/
 ## 7. Key Decisions (linked to ADRs)
 
 - Comment primary key: UUID, not auto-increment.
-- Soft delete vs hard delete for comments with children. **Still open.**
+- Soft delete for comments with children. `deleted_at` set, row retained, rendered as "[deleted]" in thread. **Resolved.**
 - Admin role determination mechanism: role column. **ADR-001, resolved.**
 - Comment section read access gated behind auth, while the rest of the page stays public.
 
 ## 8. Risks & Open Questions
 
-- Unlimited nesting depth could produce a recursive query that's slow or a UI that's unreadable at depth 10+. No depth cap is specified yet.
+- Nesting capped at 3 levels. Replies beyond depth 3 attach to the depth-3 ancestor instead of nesting further. Resolved.
 - No rate limiting specified on `POST /api/comments`. A signed-in user could spam-post.
-- Deletion semantics (soft vs hard) are unresolved and block a clean build.
+- Deletion semantics resolved via soft delete (see §7).
 - Gating `GET /api/comments` means a signed-out visitor gets zero visibility into engagement (no comment count, no preview). If the goal is visible social proof to encourage sign-in, this cuts against it. Worth a second look, but not a blocker for this exercise.
