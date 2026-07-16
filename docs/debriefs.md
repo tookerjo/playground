@@ -103,3 +103,145 @@ The real gap isn't understanding why these documents matter — I get that. It's
 ## Terms I got stuck on
 - PRD (Product Requirements Doc) vs. Tech Design Doc vs. ADR — the PRD covers what's being built and why, no code. The Tech Design Doc covers how it's being built — stack, schema, routes. The ADR (Architecture Decision Record) documents one specific decision in four short sections: Context, Decision, Alternatives, Consequences.
 - ADR specifically — I understood the format but not how to generate real content for Alternatives and Consequences from scratch.
+
+## Session 0.3 Debrief — Comments Feature (Dry Run)
+Date: July 15-16, 2026 (spanned two days, two chat windows)
+Final commit: 98415cf
+
+### What shipped
+Full dual-loop dry run on a throwaway "comments" feature in playground,
+across five build tasks plus a sixth verification task:
+
+- Task 1: Local setup (Supabase JS, Tailwind v4, shadcn/ui, gitignored
+  env files), a real Supabase project, a real Google Cloud OAuth app
+  under the parchmount.com org, verified end-to-end via an actual curl
+  call against the REST endpoint.
+- Task 2: DB schema (users mirroring auth.users, comments), RLS
+  policies, an is_admin() helper, an anti-edit trigger enforcing the
+  no-editing non-goal at the database layer. Verified by deliberately
+  querying as anonymous and confirming a real 42501 block, not just a
+  clean exit code.
+- Task 3: Real Google OAuth sign-in end-to-end — browser/server
+  Supabase clients, proxy.ts, sign-in/out actions, callback route,
+  CommentSignInGate. Tested with an actual sign-in, not just code
+  review.
+- Task 4: API routes (GET/POST/DELETE) with server-side depth-3
+  resolution (lib/comments.ts), closing off a client-side bypass. Found
+  and fixed a real bug: RLS existed but the table-level GRANT to
+  authenticated was missing — diagnosed via logging, fixed via a new
+  migration (not editing the applied one), reverified by rerunning the
+  actual test script rather than accepting "fixed."
+- Task 5: UI components (form, recursive CommentNode, CommentThread)
+  wired into page.tsx. A visual nesting bug took two rounds of
+  pushback to actually fix.
+- Task 6: Manual verification of four permission paths — non-admin
+  cross-user delete blocked (403), unauthenticated access blocked
+  (401), admin cross-user delete allowed, own-comment delete allowed.
+- Post-Task-6: Oversight Checklist pass (Design Sanity + Code Hygiene),
+  which found and fixed real auth/admin-check duplication across 4
+  call sites via a lib/auth.ts extraction. Build verified clean,
+  committed and pushed to origin/main.
+
+### What broke / what was confusing
+The GRANT bug (Task 4) was the most significant real bug — a genuine
+500 on first live POST, root-caused correctly as RLS-vs-GRANT being
+separate permission layers, not a hypothetical exercise. The
+nesting-indentation bug (Task 5) was caught by the user, not the
+agent — the data was correct but visually unreadable, and it took two
+rounds of pushback ("too modest") to get a real fix. During Task 6,
+lost track of which browser window was signed in vs. out, causing a
+few stray test comments — confusing in the moment, not a real bug.
+
+### What Claude Code did brilliantly (heavily-RL'd capability)
+Diagnosing the GRANT bug correctly and treating live migrations like
+git history (append, never rewrite). Moving depth-resolution logic
+server-side without being asked, closing a client-bypass vector
+proactively. Being honest about its own verification limits ("I
+haven't confirmed the OAuth handshake actually completes") rather than
+overclaiming. In this session specifically: the Oversight Checklist
+pass found real duplication, gave honest uncertain answers where
+warranted, and self-corrected a labeling error rather than silently
+complying with a wrong instruction.
+
+### What Claude Code did badly (RL gap)
+The real one: across tasks 1-5, Claude Code never once checked its own
+work against Session 0.3's actual stated scope (task 1, optionally
+task 2) until directly asked "why did you build it to scope creep?"
+two days in. That's a real process failure, not a minor note — it
+happened on the very first real working session, on exactly the
+failure mode flagged as the core risk going in. This session's
+standing instruction (state scope up front, check in after each task)
+exists because of this.
+
+### Oversight catches I'm proud of
+Insisting on real verification-script output twice rather than
+accepting "fixed" at face value — this is what caught the GRANT bug's
+true state and confirmed the depth-cap logic actually worked. Refusing
+to let "start on task 3" get sent before its prerequisite was actually
+committed to disk. Pausing to ask whether the Google Cloud org should
+be Parchmount's real org or separate, rather than clicking past an
+identity/scope question. Explicitly checking for hidden cost before
+proceeding on OAuth setup. In this session: stopping mid-refactor to
+ask "what are we actually doing here" when a nice-to-have code cleanup
+started to feel like unnecessary depth.
+
+### One oversight I missed (caught in review)
+Didn't initially question whether the Supabase client was typed —
+assumed TypeScript was catching query errors when createBrowserClient/
+createServerClient default to any without a generated Database type.
+Claude Code caught this in the Oversight Checklist, not proactively.
+
+### Terms I got stuck on
+Reading vs. writing commands; Tailwind + shadcn/ui; Supabase anon/
+service_role → publishable/secret key rename; OAuth redirect URI
+exact-match; RLS vs. table-level GRANTs (the real bug); Postgres error
+codes as signal; migrations as append-only; OAuth 2.0 vs. JWTs; the
+two-hop OAuth callback chain (initially modeled incorrectly as "one
+for sign-in, one for database writing" — corrected to both being
+identity/session handoffs); what a .ts file actually is (asked plainly
+after several had already been reviewed); what Postgres itself is
+(asked late, after two tasks of working with RLS); MCP; /compact vs
+/clear; terminal vs. Claude Code state confusion (twice, including
+pasting an old screenshot from the wrong task).
+
+### Session-specific reflection
+"Today took way longer than expected. This is day three of the
+syllabus. Previous days (0.1, 0.2) were individual parts — installation,
+PRD/tech design practice. Today was the first soup-to-nuts loop: adding
+a comment section with Google auth to the Hello World page.
+
+What's working: I'm not just clicking through what the agent tells me
+to do — I'm trying to actually understand what things mean before
+approving them. Pasting a screenshot and getting told exactly what to
+do next still feels a little unreal. I was intentional about applying
+real rigor to this process rather than rushing.
+
+What's hard: today made clear this isn't the 'built an app in three
+hours' experience. One feature, with real security around it, done the
+right way, takes real time. I'm not naturally that interested in the
+subject matter itself, which affects engagement — but I remain
+confident that understanding the fundamentals (even without needing to
+write Python) matters for knowing what the agent is actually doing once
+I'm running more automated loops later.
+
+Six months out, I expect to mostly be doing the design work — PRDs,
+collaborating with Claude on tech designs and ADRs — and to be
+managing intention and activity rather than execution. That's probably
+where I actually shine.
+
+The hardest part right now is the terminal/nomenclature layer — all
+the different terms for what I'm typing and why. Looking forward to
+getting past that into the stuff I'm actually curious about, especially
+adversarial agent testing (getting agents to test against each other) —
+that feels like where the real leverage will be once things get more
+automated."
+
+### Next session
+Proceeding directly to Session 1.1 (Thesis Tracker) — no Session 0.4
+needed. Session 0.3's actual verification checklist (felt every step,
+used both tools correctly, ran a real Oversight Checklist pass, caught
+real issues) was clearly met. Deferred to Project 1: generated Supabase
+types from the start (not retrofitted), and Playwright/Vitest test
+infrastructure (Session 1.6). Standing process fix now in place: state
+scope explicitly before building, check in task-by-task rather than
+after the fact.
