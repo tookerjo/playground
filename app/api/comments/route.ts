@@ -25,10 +25,13 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error } = await supabase
-    .from("comments")
-    .select("id, user_id, parent_comment_id, body, created_at, deleted_at")
-    .order("created_at", { ascending: true });
+  const [{ data, error }, { data: profile }] = await Promise.all([
+    supabase
+      .from("comments")
+      .select("id, user_id, parent_comment_id, body, created_at, deleted_at")
+      .order("created_at", { ascending: true }),
+    supabase.from("users").select("role").eq("id", user.id).single(),
+  ]);
 
   if (error) {
     console.error("GET /api/comments failed:", error);
@@ -72,7 +75,10 @@ export async function GET() {
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  return NextResponse.json({ comments: roots });
+  return NextResponse.json({
+    comments: roots,
+    currentUser: { id: user.id, isAdmin: profile?.role === "admin" },
+  });
 }
 
 export async function POST(request: Request) {
