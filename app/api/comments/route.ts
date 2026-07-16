@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser, isAdmin } from "@/lib/auth";
 import { resolveParentCommentId } from "@/lib/comments";
 
 type CommentRow = {
@@ -14,23 +14,18 @@ type CommentRow = {
 type CommentNode = CommentRow & { children: CommentNode[] };
 
 export async function GET() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   // CLAUDE.md constraint #7 / tech design §4: unauthenticated requests get
   // a 401, never partial data.
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ("response" in auth) return auth.response;
+  const { user, supabase } = auth;
 
-  const [{ data, error }, { data: profile }] = await Promise.all([
+  const [{ data, error }, adminStatus] = await Promise.all([
     supabase
       .from("comments")
       .select("id, user_id, parent_comment_id, body, created_at, deleted_at")
       .order("created_at", { ascending: true }),
-    supabase.from("users").select("role").eq("id", user.id).single(),
+    isAdmin(supabase, user.id),
   ]);
 
   if (error) {
@@ -77,19 +72,14 @@ export async function GET() {
 
   return NextResponse.json({
     comments: roots,
-    currentUser: { id: user.id, isAdmin: profile?.role === "admin" },
+    currentUser: { id: user.id, isAdmin: adminStatus },
   });
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ("response" in auth) return auth.response;
+  const { user, supabase } = auth;
 
   let payload: { body?: unknown; parent_comment_id?: unknown };
   try {
